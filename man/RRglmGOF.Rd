@@ -38,7 +38,7 @@ Responses.} Manuscript submitted for publication.
 }
 \examples{
 out <- RRglm(response ~ Gender + RR + pp + age, link="RRlink.logit", RRmodel=RRmodel,
-         p1=RRp1, p2=RRp2, data=PlagiarismRR, etastart=rep(0.01, nrow(PlagiarismRR)))
-RRglmGOF(response ~ Gender + RR + pp + age, data = PlagiarismRR, glmOutput = out)
+         p1=RRp1, p2=RRp2, data=Plagiarism, etastart=rep(0.01, nrow(Plagiarism)))
+RRglmGOF(response ~ Gender + RR + pp + age, data = Plagiarism, glmOutput = out)
 }
 

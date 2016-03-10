@@ -43,7 +43,7 @@ Implemented as a wrapper for \code{\link{glm}}. Reference: Fox, J-P, Klotzke, K.
 # The Randomized Response parameters p1, p2 and model
 # are specified for each observation in the dataset.
 out <- RRglm(response ~ Gender + RR + pp + age, link="RRlink.logit", RRmodel=RRmodel,
-         p1=RRp1, p2=RRp2, data=PlagiarismRR, etastart=rep(0.01, nrow(PlagiarismRR)))
+         p1=RRp1, p2=RRp2, data=Plagiarism, etastart=rep(0.01, nrow(Plagiarism)))
 summary(out)
 }
 \seealso{

@@ -62,8 +62,8 @@ RRglmerMod <- setClass(
 #' # The Randomized Response parameters p1, p2 and model
 #' # are specified for each observation in the dataset.
 #' out <- RRglmer(response ~ Gender + RR + pp + (1|age), link="RRlink.logit", RRmodel=RRmodel,
-#'          p1=RRp1, p2=RRp2, data=PlagiarismRR, na.action = "na.omit",
-#'          etastart = rep(0.01, nrow(PlagiarismRR)),
+#'          p1=RRp1, p2=RRp2, data=Plagiarism, na.action = "na.omit",
+#'          etastart = rep(0.01, nrow(Plagiarism)),
 #'          control = glmerControl(optimizer = "Nelder_Mead", tolPwrss = 1e-03), nAGQ = 1)
 #' summary(out)
 RRglmer <- function (formula, link, RRmodel, p1, p2, data, control = glmerControl(), na.action = "na.omit", ...) {

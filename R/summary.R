@@ -85,9 +85,12 @@ summary.RRglm <- function(object, printResiduals = FALSE, limitRRparameters = 10
   cat("Family:\t\t\t", object$family$family, "\n")
   cat("Link function:\t\t", object$family$link, "\n")
   cat("Model(s):\t\t", rrmodels[1], ls.perModelp1p2[[1]], "\n")
-  for (ii in 2:length(rrmodels))
+  if(length(rrmodels) > 1)
   {
-    cat("\t\t\t", rrmodels[ii], ls.perModelp1p2[[ii]], "\n")
+    for (ii in 2:length(rrmodels))
+    {
+      cat("\t\t\t", rrmodels[ii], ls.perModelp1p2[[ii]], "\n")
+    }
   }
   if(printResiduals)
   {
@@ -188,9 +191,12 @@ summary.RRglmerMod <- function(object, printResiduals = FALSE, limitRRparameters
   cat("Generalized linear mixed-effects model")
   cat("\n\n")
   cat("Model(s):\t", rrmodels[1], ls.perModelp1p2[[1]], "\n")
-  for (ii in 2:length(rrmodels))
+  if(length(rrmodels) > 1)
   {
-    cat("\t\t", rrmodels[ii], ls.perModelp1p2[[ii]], "\n")
+    for (ii in 2:length(rrmodels))
+    {
+      cat("\t\t", rrmodels[ii], ls.perModelp1p2[[ii]], "\n")
+    }
   }
   if(printResiduals)
   {
