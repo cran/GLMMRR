@@ -11,13 +11,15 @@
 #' @param link
 #' a glm link function for binary outcomes. Must be a function name.
 #' Available options: "RRlink.logit", "RRlink.probit", "RRlink.cloglog" and "RRlink.cauchit"
+#' @param item
+#' optional item identifier for long-format data.
 #' @param RRmodel
-#' the Randomized Response model. Can be a single value or a vector of models.
+#' the Randomized Response model, defined per case.
 #' Available options: "DQ", "Warner", "Forced", "UQM", "Crosswise", "Triangular" and "Kuk"
 #' @param p1
-#' the Randomized Response parameter p1. Must be 0 <= p1 <= 1.
+#' the Randomized Response parameter p1, defined per case. Must be 0 <= p1 <= 1.
 #' @param p2
-#' the Randomized Response parameter p2. Must be 0 <= p2 <= 1.
+#' the Randomized Response parameter p2, defined per case. Must be 0 <= p2 <= 1.
 #' @param data
 #' a data frame containing the variables named in \code{\link{formula}} as well as the Randomized Response model and parameters.
 #' If the required information cannot be found in the data frame, or if no data frame is given, then the variables are taken
@@ -41,39 +43,26 @@
 #' out <- RRglm(response ~ Gender + RR + pp + age, link="RRlink.logit", RRmodel=RRmodel,
 #'          p1=RRp1, p2=RRp2, data=Plagiarism, etastart=rep(0.01, nrow(Plagiarism)))
 #' summary(out)
-RRglm <- function (formula, link, RRmodel, p1, p2, data, na.action = "na.omit", ...) {
+RRglm <- function (formula, link, item, RRmodel, p1, p2, data, na.action = "na.omit", ...) {
 
-  # Try to find the RR parameters in the data set first
-  tryCatch(RRmodel <- eval(substitute(RRmodel), data), error=function(e) NULL)
-  tryCatch(p1 <- eval(substitute(p1), data), error=function(e) NULL)
-
-  if(!missing(p2))
-    tryCatch(p2 <- eval(substitute(p2), data), error=function(e) NULL)
-  else
-    p2 <- rep(1, length(p1))
-
-  if(!(length(RRmodel) == length(p1) && length(RRmodel) == length(p2)))
-    stop("RR parameter vectors are not of same length.")
-
-  if (!(length(RRmodel) == 1 || length(RRmodel) == nrow(data)))
-    stop("Length of RR parameters does not match 1 or number of elements in the data.")
-
-  if (any(is.na(RRmodel) | is.na(p1) | is.na(p2)))
-    stop("RR parameters must be specified for each case.")
+  # Create model frame
+  mf <- match.call(expand.dots = FALSE)
+  m <- match(c("formula", "data", "item", "RRmodel", "p1", "p2", "na.action"), names(mf), 0)
+  mf <- mf[c(1, m)]
+  mf$drop.unused.levels <- TRUE
+  mf[[1]] <- quote(stats::model.frame)
+  mf <- eval(mf, parent.frame())
+  if(is.null(mf$'(item)'))
+    mf$'(item)' <- rep("Single item", nrow(mf))
+  if(is.null(mf$'(p2)'))
+    mf$'(p2)' <- rep(NA, nrow(mf))
 
   # Translate p1, p2 to c, d for the chosen RR model
-  RRparameters <- getRRparameters(RRmodel, p1, p2)
+  RRparameters <- getRRparameters(mf$'(RRmodel)', mf$'(p1)', mf$'(p2)')
 
   # Create a dataset containing the variables of the formula and the the RR parameters
   varnames <- all.vars(formula)
-  RRdata <- data.frame(data[,varnames], "RRmodel" = RRmodel, "c" = RRparameters$c, "d" = RRparameters$d, "p1" = p1, "p2" = p2)
-
-  # Debug
-  #View(RRdata)
-
-  # If NA's shall be deleted by glm(), we must do the same for the RR paramters
-  if (na.action == "na.omit" || na.action == "na.exclude")
-    RRdata <- na.omit(RRdata)
+  RRdata <- data.frame(mf[,varnames], "Item" = mf$'(item)', "RRmodel" = mf$'(RRmodel)', "c" = RRparameters$c, "d" = RRparameters$d, "p1" = mf$'(p1)', "p2" = mf$'(p2)')
 
   # Must be a data frame
   df <- as.data.frame(data)
@@ -82,8 +71,7 @@ RRglm <- function (formula, link, RRmodel, p1, p2, data, na.action = "na.omit", 
   glmlink <- match.fun(link)
 
   # Create call object with given arguments
-  cl <- call("glm", formula = formula, family = quote(binomial(link = glmlink(RRdata$c, RRdata$d))), data = quote(df),
-             na.action = na.action)
+  cl <- call("glm", formula = formula, family = quote(RRbinomial(link = glmlink(RRdata$c, RRdata$d), c = RRdata$c, d = RRdata$d)), data = quote(df), na.action = na.action)
 
   # Make sure that additional arguments are passed
   m <- match.call(expand.dots = FALSE)
@@ -95,7 +83,8 @@ RRglm <- function (formula, link, RRmodel, p1, p2, data, na.action = "na.omit", 
   # Evaluate the call and fit the model
   output <- eval(cl)
 
-  # Add RR parameters to the output object
+  # Add item identifier and RR parameters to the output object
+  output$Item <- RRdata$Item
   output$RRmodel <- RRdata$RRmodel
   output$RRp1 <- RRdata$p1
   output$RRp2 <- RRdata$p2

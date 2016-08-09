@@ -4,7 +4,7 @@
 \alias{RRglm}
 \title{Fitting Generalized Linear Models with binary Randomized Response data}
 \usage{
-RRglm(formula, link, RRmodel, p1, p2, data, na.action = "na.omit", ...)
+RRglm(formula, link, item, RRmodel, p1, p2, data, na.action = "na.omit", ...)
 }
 \arguments{
 \item{formula}{a two-sided linear formula object describing the model to be fitted,
@@ -13,12 +13,14 @@ with the response on the left of a ~ operator and the terms, separated by + oper
 \item{link}{a glm link function for binary outcomes. Must be a function name.
 Available options: "RRlink.logit", "RRlink.probit", "RRlink.cloglog" and "RRlink.cauchit"}
 
-\item{RRmodel}{the Randomized Response model. Can be a single value or a vector of models.
+\item{item}{optional item identifier for long-format data.}
+
+\item{RRmodel}{the Randomized Response model, defined per case.
 Available options: "DQ", "Warner", "Forced", "UQM", "Crosswise", "Triangular" and "Kuk"}
 
-\item{p1}{the Randomized Response parameter p1. Must be 0 <= p1 <= 1.}
+\item{p1}{the Randomized Response parameter p1, defined per case. Must be 0 <= p1 <= 1.}
 
-\item{p2}{the Randomized Response parameter p2. Must be 0 <= p2 <= 1.}
+\item{p2}{the Randomized Response parameter p2, defined per case. Must be 0 <= p2 <= 1.}
 
 \item{data}{a data frame containing the variables named in \code{\link{formula}} as well as the Randomized Response model and parameters.
 If the required information cannot be found in the data frame, or if no data frame is given, then the variables are taken

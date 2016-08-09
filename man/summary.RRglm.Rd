@@ -2,23 +2,21 @@
 % Please edit documentation in R/summary.R
 \name{summary.RRglm}
 \alias{summary.RRglm}
-\title{Summarizing GLMMRR Fits for fixed-effect models}
+\title{Summarizing GLMMRR fits for fixed-effect models}
 \usage{
-\method{summary}{RRglm}(object, printResiduals = FALSE,
-  limitRRparameters = 10, digits = 5, ...)
+\method{summary}{RRglm}(object, p1p2.digits = 2, ...)
 }
 \arguments{
 \item{object}{an object of class RRglm.}
 
-\item{printResiduals}{print scaled Pearson residuals (default: false).}
-
-\item{limitRRparameters}{set limit for list of Randomized Response parameters (default: 10).}
-
-\item{digits}{minimal number of \emph{significant digits} (default: 5).}
+\item{p1p2.digits}{number of digits for aggregating data based on the level of protection (default: 2).}
 
 \item{...}{further arguments passed to or from other methods.}
 }
+\value{
+An object of class summary.RRglm. Extends the class \code{summary.glm} with Randomize Response data.
+}
 \description{
-Summarizing GLMMRR Fits for fixed-effect models
+Summarizing GLMMRR fits for fixed-effect models
 }
 

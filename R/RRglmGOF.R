@@ -5,12 +5,7 @@
 #' Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
 #' Responses.} Manuscript submitted for publication.
 #'
-#' @param formula
-#' a two-sided linear formula object describing the model to be fitted,
-#' with the response on the left of a ~ operator and the terms, separated by + operators, on the right.
-#' @param data
-#' a data frame containing the variables named in \code{\link{formula}}.
-#' @param glmOutput
+#' @param RRglmOutput
 #' a model fitted with the \code{\link{RRglm}} function.
 #' @param doPearson
 #' compute Pearson statistic.
@@ -32,8 +27,8 @@
 #' @examples
 #'out <- RRglm(response ~ Gender + RR + pp + age, link="RRlink.logit", RRmodel=RRmodel,
 #'          p1=RRp1, p2=RRp2, data=Plagiarism, etastart=rep(0.01, nrow(Plagiarism)))
-#'RRglmGOF(response ~ Gender + RR + pp + age, data = Plagiarism, glmOutput = out)
-RRglmGOF <- function(formula, data, glmOutput, doPearson = TRUE, doDeviance = TRUE, doHlemeshow = TRUE, hlemeshowGroups = 10, rm.na = TRUE, print = TRUE)
+#'RRglmGOF(RRglmOutput = out, doPearson = TRUE, doDeviance = TRUE, doHlemeshow = TRUE, print = TRUE)
+RRglmGOF <- function(RRglmOutput, doPearson = TRUE, doDeviance = TRUE, doHlemeshow = TRUE, hlemeshowGroups = 10, rm.na = TRUE, print = TRUE)
 {
   # Initialize
   pearson <- list(do = doPearson, obs = NULL, exp = NULL, res = NULL, stat = NA, pvalue = NA, df = NA, nGroup = NA)
@@ -41,16 +36,19 @@ RRglmGOF <- function(formula, data, glmOutput, doPearson = TRUE, doDeviance = TR
   hlemeshow <- list(do = doHlemeshow, stat = NA, pvalue = NA, df = NA, overview = NULL, nGroup = hlemeshowGroups)
 
   # Get variables in formula
-  vars <- all.vars(formula)
+  vars <- all.vars(RRglmOutput$formula)
 
   # Create a data frame to work with
-  df.work <- data.frame(y.obs = data[, vars[1]], data[, vars[2:length(vars)]])
+  df.work <- data.frame(y.obs = RRglmOutput$model[, vars[1]], RRglmOutput$model[, vars[2:length(vars)]])
+
+  # Get fitted values
+  y.fitted.tmp <- RRglmOutput$fitted.values
 
   # Handle NA's
   if (rm.na)
   {
     df.work <- na.omit(df.work)
-    y.fitted.tmp <- na.omit(glmOutput$fitted.values)
+    y.fitted.tmp <- na.omit(y.fitted.tmp)
   }
 
   # Attach fitted values at the beginning
@@ -59,26 +57,8 @@ RRglmGOF <- function(formula, data, glmOutput, doPearson = TRUE, doDeviance = TR
   if (doPearson || doDeviance)
   {
     # Determine possible unique groups, or clusters in the data
-    # First create a data frame of predictors
     df.x <- data.frame(df.work[, 3:ncol(df.work)])
-
-    # Next convert each column into a factor
-    df.x <- data.frame(lapply(1:ncol(df.x), function(jj, df.x){ as.factor(df.x[, jj])}, df.x=df.x))
-
-    # Finally merge the columns to obtain a single values for each row
-    df.x$merged <- paste(as.numeric(df.x[, 1]))
-
-    # Multiple predictors
-    if((length(vars) - 1) > 1)
-    {
-      for (ii in 2:(length(vars) - 1))
-      {
-        df.x$merged <- paste(df.x$merged, as.numeric(df.x[, ii]), sep = "_")
-      }
-    }
-
-    # Unique groups
-    factor.groups <- as.factor(df.x$merged)
+    factor.groups <- getUniqueGroups(df.x)
 
     # Number of unique groups
     nGroup <- length(levels(factor.groups))
@@ -88,7 +68,7 @@ RRglmGOF <- function(formula, data, glmOutput, doPearson = TRUE, doDeviance = TR
     deviance$nGroup <- nGroup
 
     # Number of estimated parameters
-    nParam <- length(glmOutput$coeff)
+    nParam <- length(RRglmOutput$coeff)
 
     if(nGroup <= nParam)
     {
@@ -97,14 +77,14 @@ RRglmGOF <- function(formula, data, glmOutput, doPearson = TRUE, doDeviance = TR
     }
     else
     {
-      # Expected cell probabilities
-      vec.pihat = tapply(df.work$y.fitted, factor.groups, mean)
+      # Expected cell proportions
+      vec.pihat <- getCellMeans(y = df.work$y.fitted, factor.groups = factor.groups)
 
       # Observed cell proportions
-      vec.prophat = tapply(df.work$y.obs, factor.groups, mean)
+      vec.prophat <- getCellMeans(y = df.work$y.obs, factor.groups = factor.groups)
 
       # Number of observations per group
-      vec.groupN =  tapply(rep(1, length(df.work$y.obs)), factor.groups, sum)
+      vec.groupN <- getCellSizes(n = length(df.work$y.obs), factor.groups = factor.groups)
 
       # Pearson statistic
       if (doPearson)
@@ -125,7 +105,10 @@ RRglmGOF <- function(formula, data, glmOutput, doPearson = TRUE, doDeviance = TR
         vec.prophat[which(vec.prophat == 1)] <- 1-1e-15
         deviance$obs <- vec.prophat
         deviance$exp <- vec.pihat
-        deviance$res <- sqrt(2 * vec.groupN * (vec.prophat * log(vec.prophat / vec.pihat) + (1 - vec.prophat) * log((1 - vec.prophat) / (1 - vec.pihat))))
+
+        sign <- rep(1, length(vec.prophat))
+        sign[which(vec.prophat < vec.pihat)] <- -1
+        deviance$res <- sign * sqrt(2 * vec.groupN * (vec.prophat * log(vec.prophat / vec.pihat) + (1 - vec.prophat) * log((1 - vec.prophat) / (1 - vec.pihat))))
         deviance$stat <- 2 * sum(vec.groupN * (vec.prophat * log(vec.prophat / vec.pihat) + (1 - vec.prophat) * log((1 - vec.prophat) / (1 - vec.pihat))))
         deviance$df <- nGroup - nParam
         deviance$pvalue = 1 - pchisq(deviance$stat, df = deviance$df)

@@ -1,214 +1,161 @@
-#' Summarizing GLMMRR Fits for fixed-effect models
+#' Summarizing GLMMRR fits for fixed-effect models
 #'
 #' @param object
 #' an object of class RRglm.
-#' @param printResiduals
-#' print scaled Pearson residuals (default: false).
-#' @param limitRRparameters
-#' set limit for list of Randomized Response parameters (default: 10).
-#' @param digits
-#' minimal number of \emph{significant digits} (default: 5).
+#' @param p1p2.digits
+#' number of digits for aggregating data based on the level of protection (default: 2).
 #' @param ...
 #' further arguments passed to or from other methods.
 #'
+#' @return
+#' An object of class summary.RRglm. Extends the class \code{summary.glm} with Randomize Response data.
 #' @method summary RRglm
 #' @export
-summary.RRglm <- function(object, printResiduals = FALSE, limitRRparameters = 10, digits = 5, ...)
+summary.RRglm <- function(object, p1p2.digits = 2, ...)
 {
   # Grab summary.glm output
   output.glm <- summary.glm(object, ...)
 
-  # Create a dataframe of RR paramters and glm data to work with
-  df.work <- data.frame("RRmodel" = object$RRmodel, "p1" = object$RRp1, "p2" = object$RRp2, "residuals" = as.numeric(na.omit(resid(object, type = "dev"))))
+  items <- levels(as.factor(object$Item))
+  data.all <- data.frame("Response" = object$y, "Item" = object$Item, "RRmodel" = object$RRmodel, "p1" = object$RRp1,
+                         "p2" = object$RRp2, "c" = object$RRc, "d" = object$RRd, "residuals" = na.omit(output.glm$deviance.resid))
 
-  # Combine p1 and p2 into a single column
-  df.work$level <- paste("(", df.work$p1, " | ", df.work$p2, ")", sep = "")
-
-  # Create a subset for each RR model
-  rrmodels <- levels(as.factor(df.work$RRmodel))
-  ls.perModelData <- list()
-  for(ii in 1:length(rrmodels))
+  dataPerItem <- list()
+  prevalence <- data.frame("Item" = NULL, "RRmodel" = NULL, "level" = NULL, "estimate" = NULL, "se" = NULL, "n" = NULL, "c" = NULL, "d" = NULL, "observed" = NULL, "model.level" = NULL)
+  prevalence.weighted <- data.frame("Item" = NULL, "RRmodel" = NULL, "estimate.weighted" = NULL, "se.weighted" = NULL, "n" = NULL)
+  for(aa in 1:length(items))
   {
-    ls.perModelData[[ii]] = df.work[df.work$RRmodel == rrmodels[ii], ]
-  }
+    dataPerItem[[aa]] <- list()
 
-  # For each RR model, which unique combinations of p1 | p2 are used
-  ls.perModelp1p2 <- list()
-  for (ii in 1:length(ls.perModelData))
-  {
-    ls.perModelp1p2[[ii]] <- levels(as.factor(ls.perModelData[[ii]]$level))
-  }
+    # Create a dataframe of RR parameters and glm data to work with
+    dataPerItem[[aa]]$data <- data.all[data.all$Item == items[aa], ]
 
-  # Generate output data frames per RR model
-  ls.perModelOutput <- list()
-  for(ii in 1:length(rrmodels))
-  {
-    # Limit number of columns if desired
-    # One column for each level of p1 | p2
-    if(length(ls.perModelp1p2[[ii]]) < limitRRparameters)
-      print.limit <- length(ls.perModelp1p2[[ii]])
-    else
-      print.limit <- limitRRparameters
+    # Combine p1 and p2 into a single column
+    dataPerItem[[aa]]$data$level <- paste("(", format(dataPerItem[[aa]]$data$p1, digits = p1p2.digits), " | ", format(dataPerItem[[aa]]$data$p2, digits = p1p2.digits), ")", sep = "")
 
-    if (printResiduals)
+    # Combine RR model and level of protection into a single column
+    dataPerItem[[aa]]$data$model.level <- paste(dataPerItem[[aa]]$data$RRmodel, dataPerItem[[aa]]$data$level, sep = " ")
+
+    # Subset data per RR model and per level of protection (p1 and p2)
+    rrmodels <- levels(as.factor(dataPerItem[[aa]]$data$RRmodel))
+    dataPerItem[[aa]]$dataPerModel <- list() # data per RR model
+    dataPerItem[[aa]]$p1p2PerModel <- list() # levels of protection per RR model
+    dataPerItem[[aa]]$dataPerLevel <- list() # data per level
+
+    for(ii in 1:length(rrmodels))
     {
-      # Obtain information about residuals for the model
-      tmp <- summary(ls.perModelData[[ii]]$residuals)
+      dataPerItem[[aa]]$dataPerModel[[ii]] <- dataPerItem[[aa]]$data[dataPerItem[[aa]]$data$RRmodel == rrmodels[ii], ]
+      this.levels <- dataPerItem[[aa]]$p1p2PerModel[[ii]] <- levels(as.factor(dataPerItem[[aa]]$dataPerModel[[ii]]$level))
 
-      # Create a data frame for each RR model containing the desired information by level
-      ls.perModelOutput[ii] <- data.frame("Total" = c(tmp[1], tmp[2], tmp[3], tmp[5], tmp[6]))
-      for(jj in 1:print.limit)
+      for(jj in 1:length(this.levels))
       {
-        # The subset for this model
-        tmp.modelData <- ls.perModelData[[ii]]
+        this.data <- dataPerItem[[aa]]$dataPerLevel[[length(dataPerItem[[aa]]$dataPerLevel) + 1]] <- dataPerItem[[aa]]$dataPerModel[[ii]][dataPerItem[[aa]]$dataPerModel[[ii]]$level == this.levels[[jj]], ]
 
-        # Obtain information about residuals for the model and the given level
-        tmp <- summary(tmp.modelData[tmp.modelData$level == ls.perModelp1p2[[ii]][[jj]], ]$residuals)
-
-        # Attach information to the data frame
-        ls.perModelOutput[[ii]] <- cbind(ls.perModelOutput[[ii]], e = c(tmp[1], tmp[2], tmp[3], tmp[5], tmp[6]))
+        tmp.prev <- getMLPrevalence(mu = mean(this.data$Response), n = nrow(this.data), c = this.data[1, "c"], d = this.data[1, "d"])
+        prevalence <- rbind.data.frame(prevalence, data.frame("Item" = items[aa], "RRmodel" = rrmodels[ii], "level" = this.levels[jj], "estimate" = tmp.prev$'ML estimate', "se" = sqrt(tmp.prev$'variance'),
+                                                              "n" = nrow(this.data), "c" = this.data[1, "c"], "d" = this.data[1, "d"], "observed" = mean(this.data$Response), "model.level" = this.data[1, "model.level"]))
       }
-
-      # Set column names
-      colnames(ls.perModelOutput[[ii]]) <- c("Total", ls.perModelp1p2[[ii]])
     }
+
+    # Weighted prevalence
+    this.prevalence <- prevalence[which(prevalence$Item == items[aa]),]
+    sum.n <- with(this.prevalence, aggregate(list(n=n), list(RRmodel = RRmodel), sum))
+    weighted.estimate <- as.vector(by(this.prevalence[c("estimate", "n")], list(this.prevalence$RRmodel), function(x) { do.call(weighted.mean, unname(x)) } ))
+    weighted.c <- as.vector(by(this.prevalence[c("c", "n")], list(this.prevalence$RRmodel), function(x) { do.call(weighted.mean, unname(x)) } ))
+    weighted.d <- as.vector(by(this.prevalence[c("d", "n")], list(this.prevalence$RRmodel), function(x) { do.call(weighted.mean, unname(x)) } ))
+    weighted.mu <- as.vector(by(this.prevalence[c("observed", "n")], list(this.prevalence$RRmodel), function(x) { do.call(weighted.mean, unname(x)) } ))
+    weighted.se <- sqrt(getMLPrevalence(mu = weighted.mu, n = sum.n$n, c = weighted.c, d = weighted.d)$variance)
+    prevalence.weighted <- rbind.data.frame(prevalence.weighted, data.frame("Item" = items[aa], "RRmodel" = sum.n[1], "estimate.weighted" = weighted.estimate, "se.weighted" = weighted.se, "n" = sum.n[2]))
+
   }
 
-  # Print the output given by summary.glm()
-  print(output.glm)
+  output.glm$dataPerItem <- dataPerItem
+  output.glm$prevalence <- prevalence
+  output.glm$prevalence.weighted <- prevalence.weighted
 
-  cat("\n")
-  cat("### GLMMRR - Binary Randomized Response Data ###")
-  cat("\n")
-  cat("Generalized linear fixed-effects model")
-  cat("\n\n")
-  cat("Family:\t\t\t", object$family$family, "\n")
-  cat("Link function:\t\t", object$family$link, "\n")
-  cat("Model(s):\t\t", rrmodels[1], ls.perModelp1p2[[1]], "\n")
-  if(length(rrmodels) > 1)
-  {
-    for (ii in 2:length(rrmodels))
-    {
-      cat("\t\t\t", rrmodels[ii], ls.perModelp1p2[[ii]], "\n")
-    }
-  }
-  if(printResiduals)
-  {
-    for (ii in 1:length(rrmodels))
-    {
-      cat("\n")
-      cat("---------------------------------------------------------")
-      cat("\n")
-      cat("Deviance residuals for", rrmodels[ii], "(p1 | p2) \n")
-      print(ls.perModelOutput[[ii]], digits = digits)
-      cat("\n")
-    }
-  }
-  cat("\n")
+  class(output.glm) <- c("summary.RRglm", "summary.glm")
+
+  return(output.glm)
 }
 
-#' Summarizing GLMMRR Fits for mixed-effect models
+#' Summarizing GLMMRR fits for fixed-effect models
 #'
 #' @param object
-#' an object of class RRglmerMod.
-#' @param printResiduals
-#' print scaled Pearson residuals (default: false).
-#' @param limitRRparameters
-#' set limit for list of Randomized Response parameters (default: 10).
-#' @param digits
-#' minimal number of \emph{significant digits} (default: 5).
+#' an object of class RRglm.
+#' @param p1p2.digits
+#' number of digits for aggregating data based on the level of protection (default: 2).
 #' @param ...
 #' further arguments passed to or from other methods.
 #'
+#' @return
+#' An object of class summary.RRglmerMod. Extends the class \code{summary.glmerMod} with Randomize Response data.
 #' @method summary RRglmerMod
 #' @export
-summary.RRglmerMod <- function(object, printResiduals = FALSE, limitRRparameters = 10, digits = 5, ...)
+summary.RRglmerMod <- function(object, p1p2.digits = 2, ...)
 {
   # Grab summary.merMod output
-  output.merMod <- summary(as(object, "glmerMod"), ...)
+  tmp <- summary(as(object, "glmerMod"), ...)
+  output.merMod <- as.list(tmp)
 
-  # Create a dataframe of RR paramters
-  df.work <- data.frame("RRmodel" = object@RRparam$RRmodel, "p1" = object@RRparam$p1, "p2" = object@RRparam$p2, "residuals" = as.numeric(na.omit(resid(object, type = "pearson", scale = TRUE))))
+  items <- levels(as.factor(object@RRparam$Item))
+  data.all <- data.frame("Response" = object@resp$y, "Item" = object@RRparam$Item, "RRmodel" = object@RRparam$RRmodel, "p1" = object@RRparam$p1,
+                         "p2" = object@RRparam$p2, "c" = object@RRparam$c, "d" = object@RRparam$d, "residuals" = na.omit(residuals(tmp, type = "deviance")))
 
-  # Combine p1 and p2 into a single column
-  df.work$level <- paste("(", df.work$p1, " | ", df.work$p2, ")", sep = "")
-
-  # Create a subset for each RR model
-  rrmodels <- levels(as.factor(df.work$RRmodel))
-  ls.perModelData <- list()
-  for(ii in 1:length(rrmodels))
+  dataPerItem <- list()
+  prevalence <- data.frame("Item" = NULL, "RRmodel" = NULL, "level" = NULL, "estimate" = NULL, "se" = NULL, "n" = NULL, "c" = NULL, "d" = NULL, "observed" = NULL, "model.level" = NULL)
+  prevalence.weighted <- data.frame("Item" = NULL, "RRmodel" = NULL, "estimate.weighted" = NULL, "se.weighted" = NULL, "n" = NULL)
+  for(aa in 1:length(items))
   {
-    ls.perModelData[[ii]] = df.work[df.work$RRmodel == rrmodels[ii], ]
-  }
+    dataPerItem[[aa]] <- list()
 
-  # For each RR model, which unique combinations of p1 | p2 are used
-  ls.perModelp1p2 <- list()
-  for (ii in 1:length(ls.perModelData))
-  {
-    ls.perModelp1p2[[ii]] <- levels(as.factor(ls.perModelData[[ii]]$level))
-  }
+    # Create a dataframe of RR parameters and glm data to work with
+    dataPerItem[[aa]]$data <- data.all[data.all$Item == items[aa], ]
 
-  # Generate output data frames per RR model
-  ls.perModelOutput <- list()
-  for(ii in 1:length(rrmodels))
-  {
-    # Limit number of columns if desired
-    # One column for each level of p1 | p2
-    if(length(ls.perModelp1p2[[ii]]) < limitRRparameters)
-      print.limit <- length(ls.perModelp1p2[[ii]])
-    else
-      print.limit <- limitRRparameters
+    # Combine p1 and p2 into a single column
+    dataPerItem[[aa]]$data$level <- paste("(", format(dataPerItem[[aa]]$data$p1, digits = p1p2.digits), " | ", format(dataPerItem[[aa]]$data$p2, digits = p1p2.digits), ")", sep = "")
 
-    if (printResiduals)
+    # Combine RR model and level of protection into a single column
+    dataPerItem[[aa]]$data$model.level <- paste(dataPerItem[[aa]]$data$RRmodel, dataPerItem[[aa]]$data$level, sep = " ")
+
+    # Subset data per RR model and per level of protection (p1 and p2)
+    rrmodels <- levels(as.factor(dataPerItem[[aa]]$data$RRmodel))
+    dataPerItem[[aa]]$dataPerModel <- list() # data per RR model
+    dataPerItem[[aa]]$p1p2PerModel <- list() # levels of protection per RR model
+    dataPerItem[[aa]]$dataPerLevel <- list() # data per level
+
+    for(ii in 1:length(rrmodels))
     {
-      # Obtain information about residuals for the model
-      tmp <- summary(ls.perModelData[[ii]]$residuals)
+      dataPerItem[[aa]]$dataPerModel[[ii]] <- dataPerItem[[aa]]$data[dataPerItem[[aa]]$data$RRmodel == rrmodels[ii], ]
+      this.levels <- dataPerItem[[aa]]$p1p2PerModel[[ii]] <- levels(as.factor(dataPerItem[[aa]]$dataPerModel[[ii]]$level))
 
-      # Create a data frame for each RR model containing the desired information by level
-      ls.perModelOutput[ii] <- data.frame("Total" = c(tmp[1], tmp[2], tmp[3], tmp[5], tmp[6]))
-      for(jj in 1:print.limit)
+      for(jj in 1:length(this.levels))
       {
-        # The subset for this model
-        tmp.modelData <- ls.perModelData[[ii]]
+        this.data <- dataPerItem[[aa]]$dataPerLevel[[length(dataPerItem[[aa]]$dataPerLevel) + 1]] <- dataPerItem[[aa]]$dataPerModel[[ii]][dataPerItem[[aa]]$dataPerModel[[ii]]$level == this.levels[[jj]], ]
 
-        # Obtain information about residuals for the model and the given level
-        tmp <- summary(tmp.modelData[tmp.modelData$level == ls.perModelp1p2[[ii]][[jj]], ]$residuals)
-
-        # Attach information to the data frame
-        ls.perModelOutput[[ii]] <- cbind(ls.perModelOutput[[ii]], e = c(tmp[1], tmp[2], tmp[3], tmp[5], tmp[6]))
+        tmp.prev <- getMLPrevalence(mu = mean(this.data$Response), n = nrow(this.data), c = this.data[1, "c"], d = this.data[1, "d"])
+        prevalence <- rbind.data.frame(prevalence, data.frame("Item" = items[aa], "RRmodel" = rrmodels[ii], "level" = this.levels[jj], "estimate" = tmp.prev$'ML estimate', "se" = sqrt(tmp.prev$'variance'),
+                                                              "n" = nrow(this.data), "c" = this.data[1, "c"], "d" = this.data[1, "d"], "observed" = mean(this.data$Response), "model.level" = this.data[1, "model.level"]))
       }
-
-      # Set column names
-      colnames(ls.perModelOutput[[ii]]) <- c("Total", ls.perModelp1p2[[ii]])
     }
+
+    # Weighted prevalence
+    this.prevalence <- prevalence[which(prevalence$Item == items[aa]),]
+    sum.n <- with(this.prevalence, aggregate(list(n=n), list(RRmodel = RRmodel), sum))
+    weighted.estimate <- as.vector(by(this.prevalence[c("estimate", "n")], list(this.prevalence$RRmodel), function(x) { do.call(weighted.mean, unname(x)) } ))
+    weighted.c <- as.vector(by(this.prevalence[c("c", "n")], list(this.prevalence$RRmodel), function(x) { do.call(weighted.mean, unname(x)) } ))
+    weighted.d <- as.vector(by(this.prevalence[c("d", "n")], list(this.prevalence$RRmodel), function(x) { do.call(weighted.mean, unname(x)) } ))
+    weighted.mu <- as.vector(by(this.prevalence[c("observed", "n")], list(this.prevalence$RRmodel), function(x) { do.call(weighted.mean, unname(x)) } ))
+    weighted.se <- sqrt(getMLPrevalence(mu = weighted.mu, n = sum.n$n, c = weighted.c, d = weighted.d)$variance)
+    prevalence.weighted <- rbind.data.frame(prevalence.weighted, data.frame("Item" = items[aa], "RRmodel" = sum.n[1], "estimate.weighted" = weighted.estimate, "se.weighted" = weighted.se, "n" = sum.n[2]))
+
   }
 
-  print(output.merMod)
+  output.merMod$dataPerItem <- dataPerItem
+  output.merMod$prevalence <- prevalence
+  output.merMod$prevalence.weighted <- prevalence.weighted
+  output.merMod$glmerMod <- tmp
 
-  cat("\n")
-  cat("### GLMMRR - Binary Randomized Response Data ###")
-  cat("\n")
-  cat("Generalized linear mixed-effects model")
-  cat("\n\n")
-  cat("Model(s):\t", rrmodels[1], ls.perModelp1p2[[1]], "\n")
-  if(length(rrmodels) > 1)
-  {
-    for (ii in 2:length(rrmodels))
-    {
-      cat("\t\t", rrmodels[ii], ls.perModelp1p2[[ii]], "\n")
-    }
-  }
-  if(printResiduals)
-  {
-    for (ii in 1:length(rrmodels))
-    {
-      cat("\n")
-      cat("---------------------------------------------------------")
-      cat("\n")
-      cat("Scaled Pearson residuals for", rrmodels[ii], "(p1 | p2) \n")
-      print(ls.perModelOutput[[ii]], digits = digits)
-      cat("\n")
-    }
-  }
-  cat("\n")
+  class(output.merMod) <- c("summary.RRglmerMod", "summary.glmerMod")
+
+  return(output.merMod)
 }

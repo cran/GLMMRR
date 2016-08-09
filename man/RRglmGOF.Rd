@@ -4,16 +4,11 @@
 \alias{RRglmGOF}
 \title{Goodness-of-fit statistics for binary Randomized Response data}
 \usage{
-RRglmGOF(formula, data, glmOutput, doPearson = TRUE, doDeviance = TRUE,
+RRglmGOF(RRglmOutput, doPearson = TRUE, doDeviance = TRUE,
   doHlemeshow = TRUE, hlemeshowGroups = 10, rm.na = TRUE, print = TRUE)
 }
 \arguments{
-\item{formula}{a two-sided linear formula object describing the model to be fitted,
-with the response on the left of a ~ operator and the terms, separated by + operators, on the right.}
-
-\item{data}{a data frame containing the variables named in \code{\link{formula}}.}
-
-\item{glmOutput}{a model fitted with the \code{\link{RRglm}} function.}
+\item{RRglmOutput}{a model fitted with the \code{\link{RRglm}} function.}
 
 \item{doPearson}{compute Pearson statistic.}
 
@@ -39,6 +34,6 @@ Responses.} Manuscript submitted for publication.
 \examples{
 out <- RRglm(response ~ Gender + RR + pp + age, link="RRlink.logit", RRmodel=RRmodel,
          p1=RRp1, p2=RRp2, data=Plagiarism, etastart=rep(0.01, nrow(Plagiarism)))
-RRglmGOF(response ~ Gender + RR + pp + age, data = Plagiarism, glmOutput = out)
+RRglmGOF(RRglmOutput = out, doPearson = TRUE, doDeviance = TRUE, doHlemeshow = TRUE, print = TRUE)
 }
 
