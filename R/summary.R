@@ -72,6 +72,7 @@ summary.RRglm <- function(object, p1p2.digits = 2, ...)
   output.glm$dataPerItem <- dataPerItem
   output.glm$prevalence <- prevalence
   output.glm$prevalence.weighted <- prevalence.weighted
+  output.glm$RRlink <- object$RRlink
 
   class(output.glm) <- c("summary.RRglm", "summary.glm")
 
@@ -154,6 +155,7 @@ summary.RRglmerMod <- function(object, p1p2.digits = 2, ...)
   output.merMod$prevalence <- prevalence
   output.merMod$prevalence.weighted <- prevalence.weighted
   output.merMod$glmerMod <- tmp
+  output.merMod$RRlink <- object@RRparam$RRlink
 
   class(output.merMod) <- c("summary.RRglmerMod", "summary.glmerMod")
 

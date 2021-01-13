@@ -4,8 +4,13 @@
 \alias{plot.RRglm}
 \title{Plot diagnostics for a RRglm object}
 \usage{
-\method{plot}{RRglm}(x, which = c(1, 3, 4, 6), type = c("deviance",
-  "pearson"), ngroups = 10, ...)
+\method{plot}{RRglm}(
+  x,
+  which = c(1, 3, 4, 6),
+  type = c("deviance", "pearson"),
+  ngroups = 10,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class RRglm.}
@@ -21,16 +26,13 @@
 \description{
 Six plots (selectable by \code{which}) are currently available: (1) a plot of estimated population prevalence per RR model,
 (2) a plot of estimated population prevalence per protection level,
-(3) a plot of ungrouped residuals against predicted honest response,
-(4) a plot of grouped (on covariates) residuals against predicted honest response,
-(5) a plot of grouped Hosmer-Lemeshow residuals against predicted response,
+(3) a plot of ungrouped residuals against fitted response probability,
+(4) a plot of grouped (on covariates) residuals against fitted response probability,
+(5) a plot of grouped Hosmer-Lemeshow residuals against fitted response probability,
 and (6) a Normal Q-Q plot of grouped (on covariates) residuals. By default, plots 1, 3, 4 and 6 are provided.
-Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-Responses.} Manuscript submitted for publication.
 }
 \examples{
 out <- RRglm(response ~ Gender + RR + pp + age, link="RRlink.logit", RRmodel=RRmodel,
          p1=RRp1, p2=RRp2, data=Plagiarism, etastart=rep(0.01, nrow(Plagiarism)))
 plot(out, which = 1:6, type = "deviance", ngroups = 50)
 }
-

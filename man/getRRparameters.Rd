@@ -17,8 +17,5 @@ getRRparameters(vec.RRmodel, vec.p1, vec.p2)
 a list with c and d values.
 }
 \description{
-Represent Randomize Response models with two parameters, c and d. Reference:
-Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-Responses.} Manuscript submitted for publication.
+Compute Randomized Response parameters
 }
-

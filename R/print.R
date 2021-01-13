@@ -11,9 +11,14 @@
 print.RRglmGOF <- function(x, digits = 3, ...)
 {
   cat("\n")
-  cat("GLMMRR - Binary Randomized Response Data")
+  cat("### GLMMRR - Binary Randomized Response Data ###")
+  cat("\n")
+  cat("Generalized linear fixed-effects model")
   cat("\n\n")
-  cat("Goodness-of-Fit Testing\n")
+  cat("# Goodness-of-Fit Testing #\n")
+  cat("---------------------------------------------------------\n")
+  cat("Family:\t\t\t\t", x$family$family, "\n")
+  cat("Link function:\t\t\t", x$family$link, "\n")
   cat("Response variable:\t\t", x$vars[1], "\n")
   cat("Predictor(s):\t\t\t", x$vars[2:length(x$vars)], "\n")
   cat("Entries dataset:\t\t", x$n, "\n")
@@ -102,6 +107,7 @@ print.summary.RRglm <- function(x, printPrevalence = TRUE, printPrevalencePerLev
       {
         # Obtain information about residuals for the model
         tmp <- summary(this.item$dataPerModel[[rr]]$residuals)
+        tmp <- unclass(tmp)
 
         # Create a data frame for each RR model
         ls.perItemResidualOutput[[ii]] <- rbind.data.frame(ls.perItemResidualOutput[[ii]], data.frame("Min." = tmp[1], "1st Qu." = tmp[2], "Median" = tmp[3], "3rd Qu." = tmp[5], "Max." = tmp[6]))
@@ -209,6 +215,7 @@ print.summary.RRglmerMod <- function(x, printPrevalence = TRUE, printPrevalenceP
       {
         # Obtain information about residuals for the model
         tmp <- summary(this.item$dataPerModel[[rr]]$residuals)
+        tmp <- unclass(tmp)
 
         # Create a data frame for each RR model
         ls.perItemResidualOutput[[ii]] <- rbind.data.frame(ls.perItemResidualOutput[[ii]], data.frame("Min." = tmp[1], "1st Qu." = tmp[2], "Median" = tmp[3], "3rd Qu." = tmp[5], "Max." = tmp[6]))

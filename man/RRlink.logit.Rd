@@ -15,7 +15,5 @@ RRlink.logit(c, d)
 RR link function.
 }
 \description{
-Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-Responses.} Manuscript submitted for publication.
+Logit link function with Randomized Response parameters.
 }
-

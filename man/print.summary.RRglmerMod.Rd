@@ -4,9 +4,14 @@
 \alias{print.summary.RRglmerMod}
 \title{Print RRglmer summary}
 \usage{
-\method{print}{summary.RRglmerMod}(x, printPrevalence = TRUE,
-  printPrevalencePerLevel = FALSE, printResiduals = FALSE, digits = 5,
-  ...)
+\method{print}{summary.RRglmerMod}(
+  x,
+  printPrevalence = TRUE,
+  printPrevalencePerLevel = FALSE,
+  printResiduals = FALSE,
+  digits = 5,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class summary.RRglmerMod.}
@@ -24,4 +29,3 @@
 \description{
 Print RRglmer summary
 }
-

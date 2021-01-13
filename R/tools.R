@@ -16,19 +16,19 @@ getUniqueGroups <- function(x)
   if(ncol(df.x) == 1)
     return(as.factor(x))
 
-  # Next convert each column into a factor
-  df.x <- data.frame(lapply(1:ncol(df.x), function(jj, df.x){ as.factor(df.x[, jj])}, df.x=df.x))
+  # Next convert each column into a factor, keep existing factors
+  for (ii in 1:ncol(df.x)) {
+    if (!is.factor(df.x[,ii])) {
+      df.x[,ii] <- as.factor(df.x[,ii])
+    }
+  }
+  #df.x <- data.frame(lapply(1:ncol(df.x), function(jj, df.x){ as.factor(df.x[, jj])}, df.x=df.x))
 
   # Finally merge the columns to obtain a single values for each row
   df.x$merged <- paste(as.numeric(df.x[, 1]))
-
-  # Multiple predictors
-  if(ncol(x) > 1)
+  for (ii in 2:ncol(x))
   {
-    for (ii in 1:ncol(x))
-    {
-      df.x$merged <- paste(df.x$merged, as.numeric(df.x[, ii]), sep = "_")
-    }
+    df.x$merged <- paste(df.x$merged, as.numeric(df.x[, ii]), sep = "_")
   }
 
   # Unique groups

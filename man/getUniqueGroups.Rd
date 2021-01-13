@@ -15,4 +15,3 @@ a factor of unique groups.
 \description{
 Get unique groups of covariates
 }
-

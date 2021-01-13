@@ -17,11 +17,9 @@
 Five plots (selectable by \code{which}) are currently available: (1) a plot of estimated population prevalence per RR model,
 (2) a plot of estimated population prevalence per protection level,
 (3) a plot of random effects and their conditional variance (95%-cI),
-(4) a plot of conditional pearson residuals against predicted honest response,
-and (5) a plot of unconditional pearson residuals against predicted honest response.
+(4) a plot of conditional pearson residuals against fitted randomized response probability,
+and (5) a plot of unconditional pearson residuals against fitted randomized response probability.
 By default, plots 1, 3, 4 and 5 are provided.
-Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-Responses.} Manuscript submitted for publication.
 }
 \examples{
 out <- RRglmer(response ~ Gender + RR + pp + (1+pp|age), link="RRlink.logit", RRmodel=RRmodel,
@@ -30,4 +28,3 @@ out <- RRglmer(response ~ Gender + RR + pp + (1+pp|age), link="RRlink.logit", RR
          control = glmerControl(optimizer = "Nelder_Mead", tolPwrss = 1e-03), nAGQ = 1)
 plot(out, which = 1:5)
 }
-

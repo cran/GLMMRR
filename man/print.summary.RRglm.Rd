@@ -4,9 +4,14 @@
 \alias{print.summary.RRglm}
 \title{Print RRglm summary}
 \usage{
-\method{print}{summary.RRglm}(x, printPrevalence = TRUE,
-  printPrevalencePerLevel = FALSE, printResiduals = FALSE, digits = 5,
-  ...)
+\method{print}{summary.RRglm}(
+  x,
+  printPrevalence = TRUE,
+  printPrevalencePerLevel = FALSE,
+  printResiduals = FALSE,
+  digits = 5,
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class summary.RRglm.}
@@ -24,4 +29,3 @@
 \description{
 Print RRglm summary
 }
-

@@ -19,4 +19,3 @@ the cell means.
 \description{
 Get cell means for unique groups of covariates
 }
-

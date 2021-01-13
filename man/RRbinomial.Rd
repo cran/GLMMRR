@@ -24,4 +24,3 @@ The upper and lower limits for mu's depend on the Randomized Response parameters
 \seealso{
 \code{\link{family}}
 }
-

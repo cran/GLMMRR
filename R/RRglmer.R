@@ -1,8 +1,9 @@
 #' @import lme4 methods
 #' @importFrom stats dnorm na.omit pchisq pnorm qnorm quantile resid summary.glm binomial predict
-#' residuals residuals.glm setNames weighted.mean
+#' residuals residuals.glm setNames weighted.mean fitted
 #' @importFrom grDevices dev.flush dev.hold devAskNewPage
 #' @importFrom utils capture.output stack
+#' @importFrom RColorBrewer brewer.pal
 
 
 # Extending glmerMod to contain RR parameters for plot and summary functions
@@ -22,8 +23,8 @@ RRglmerMod <- setClass(
 #' Fit a generalized linear mixed-effects model (GLMM) with binary Randomized Response data.
 #' Both fixed effects and random effects are specified via the model formula.
 #' Randomize response parameters can be entered either as single values or as vectors.
-#' Implemented as a wrapper for \code{\link{glmer}}. Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016).
-#' \emph{Generalized Linear Mixed Models for Randomized Responses.} Manuscript submitted for publication.
+#' Implemented as a wrapper for \code{\link{glmer}}. Reference: Fox, J-P, Veen, D. and Klotzke, K. (2018).
+#' Generalized Linear Mixed Models for Randomized Responses. \emph{Methodology.} https://doi.org/10.1027/1614-2241/a000153
 #'
 #' @param formula
 #' a two-sided linear formula object describing both the fixed-effects and fixed-effects part of the model,
@@ -117,7 +118,7 @@ RRglmer <- function (formula, item, link, RRmodel, p1, p2, data, control = glmer
   output <- eval(cl)
 
   # Put item identifier and RR parameters in a list
-  RRparam <- list(Item = RRdata$Item, RRmodel = RRdata$RRmodel, p1 = RRdata$p1, p2 = RRdata$p2, c = RRdata$c, d = RRdata$d)
+  RRparam <- list(Item = RRdata$Item, RRlink = link, RRmodel = RRdata$RRmodel, p1 = RRdata$p1, p2 = RRdata$p2, c = RRdata$c, d = RRdata$d)
 
   # Add a slot for the RR parameters
   outputRR <- as(output, "RRglmerMod")

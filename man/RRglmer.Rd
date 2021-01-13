@@ -4,8 +4,18 @@
 \alias{RRglmer}
 \title{Fitting Generalized Linear Mixed-Effects Models with binary Randomized Response data}
 \usage{
-RRglmer(formula, item, link, RRmodel, p1, p2, data, control = glmerControl(),
-  na.action = "na.omit", ...)
+RRglmer(
+  formula,
+  item,
+  link,
+  RRmodel,
+  p1,
+  p2,
+  data,
+  control = glmerControl(),
+  na.action = "na.omit",
+  ...
+)
 }
 \arguments{
 \item{formula}{a two-sided linear formula object describing both the fixed-effects and fixed-effects part of the model,
@@ -46,8 +56,8 @@ for which many methods are available (e.g. \code{methods(class="glmerMod")}).
 Fit a generalized linear mixed-effects model (GLMM) with binary Randomized Response data.
 Both fixed effects and random effects are specified via the model formula.
 Randomize response parameters can be entered either as single values or as vectors.
-Implemented as a wrapper for \code{\link{glmer}}. Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016).
-\emph{Generalized Linear Mixed Models for Randomized Responses.} Manuscript submitted for publication.
+Implemented as a wrapper for \code{\link{glmer}}. Reference: Fox, J-P, Veen, D. and Klotzke, K. (2018).
+Generalized Linear Mixed Models for Randomized Responses. \emph{Methodology.} https://doi.org/10.1027/1614-2241/a000153
 }
 \examples{
 # Fit the model with fixed effects for gender, RR and pp
@@ -63,4 +73,3 @@ summary(out)
 \seealso{
 \code{\link{lme4}}
 }
-

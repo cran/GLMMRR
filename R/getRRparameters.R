@@ -1,9 +1,5 @@
 #' Compute Randomized Response parameters
 #'
-#' Represent Randomize Response models with two parameters, c and d. Reference:
-#' Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-#' Responses.} Manuscript submitted for publication.
-#'
 #'
 #' @param vec.RRmodel
 #' a character vector of Randomized Response models.

@@ -1,8 +1,6 @@
 #' Accessing GLMMRR Fits for fixed-effect models
 #'
 #' Compute residuals for RRglm objects. Extends \code{\link{residuals.glm}} with residuals for grouped binary Randomized Response data.
-#' Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-#' Responses.} Manuscript submitted for publication.
 #'
 #' @param object
 #' an object of class RRglm.
@@ -98,8 +96,6 @@ residuals.RRglm <- function (object, type = c("deviance", "pearson", "working", 
 #'
 #' Compute residuals for RRglmer objects. Extends \code{\link{residuals.glmResp}} to access conditional and
 #' unconditional residuals for grouped binary Randomized Response data.
-#' Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-#' Responses.} Manuscript submitted for publication.
 #'
 #' @param object
 #' an object of class RRglmer.

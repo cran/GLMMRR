@@ -19,4 +19,3 @@ the number of units in each cell.
 \description{
 Get number of units in each cell
 }
-

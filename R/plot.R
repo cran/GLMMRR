@@ -2,12 +2,10 @@
 #'
 #' Six plots (selectable by \code{which}) are currently available: (1) a plot of estimated population prevalence per RR model,
 #' (2) a plot of estimated population prevalence per protection level,
-#' (3) a plot of ungrouped residuals against predicted honest response,
-#' (4) a plot of grouped (on covariates) residuals against predicted honest response,
-#' (5) a plot of grouped Hosmer-Lemeshow residuals against predicted response,
+#' (3) a plot of ungrouped residuals against fitted response probability,
+#' (4) a plot of grouped (on covariates) residuals against fitted response probability,
+#' (5) a plot of grouped Hosmer-Lemeshow residuals against fitted response probability,
 #' and (6) a Normal Q-Q plot of grouped (on covariates) residuals. By default, plots 1, 3, 4 and 6 are provided.
-#' Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-#' Responses.} Manuscript submitted for publication.
 #'
 #' @param x
 #' an object of class RRglm.
@@ -32,7 +30,18 @@ plot.RRglm <- function(x, which = c(1, 3, 4, 6), type = c("deviance", "pearson")
   show[which] <- TRUE
 
   eta <- x$linear.predictors
-  pi <- exp(eta) / (1 + exp(eta))
+  #pi <- exp(eta) / (1 + exp(eta))
+  pi <- x$fitted.values
+
+  if (length(levels(as.factor(x$RRmodel))) <= 9) {
+    col.set <- RColorBrewer::brewer.pal(9, "Set1")
+  }
+  else if (length(levels(as.factor(x$RRmodel))) > 9 && length(levels(as.factor(x$RRmodel))) <= 12) {
+    col.set <- RColorBrewer::brewer.pal(12, "Set3")
+  }
+  else {
+    col.set <- rep("blue", length(levels(as.factor(x$RRmodel))))
+  }
 
   if(any(show[1], show[2]))
   {
@@ -76,7 +85,7 @@ plot.RRglm <- function(x, which = c(1, 3, 4, 6), type = c("deviance", "pearson")
     rownames(tmp$Prevalence) <- paste(p$Item, " (", p$RRmodel, ")", sep="")
 
     dev.hold()
-    ignore <- capture.output(print(intDotplot(tmp, mtit = "Prevalence (95%-CI)")))
+    ignore <- capture.output(print(intDotplot(tmp, mtit = "Prevalence (95%-CI)", cex = 1, scales = list(cex = 1.05))))
     dev.flush()
   }
   if(show[2])
@@ -88,41 +97,49 @@ plot.RRglm <- function(x, which = c(1, 3, 4, 6), type = c("deviance", "pearson")
     rownames(tmp$Prevalence) <- paste(p$Item, " (", p$model.level, ")", sep="")
 
     dev.hold()
-    ignore <- capture.output(print(intDotplot(tmp, mtit = "Prevalence (95%-CI)")))
+    ignore <- capture.output(print(intDotplot(tmp, mtit = "Prevalence (95%-CI)", cex = 1, scales = list(cex = 1.05))))
     dev.flush()
   }
   if(show[3])
   {
     res <- residuals(x, type = type)
+    #col <- addalpha(col.set, alpha = 0.4)[as.numeric(as.factor(x$RRmodel))]
+    col <- col.set[as.numeric(as.factor(x$RRmodel))]
+    col.legend <- col.set[1:length(levels(as.factor(x$RRmodel)))]
+    pch <- as.numeric(as.factor(x$RRmodel)) + 14
+    pch.legend <- 1:length(levels(as.factor(x$RRmodel))) + 14
     dev.hold()
-    print(lattice::xyplot(res ~ pi, main = "Residuals vs. Predicted honest response", ylab = ylab.res,
-         xlab = "Predicted affirmative honest response probability"))
+    print(lattice::xyplot(res ~ pi, main = "Residuals vs. Fitted randomized response probability", ylab = list(label = ylab.res, cex=1.1),
+         xlab = list(label = "Fitted randomized response probability", cex=1.1), cex = 1.2, pch = pch, col = col, scales = list(cex = 1.05)
+         , key=list(corner=c(1,1), border = TRUE, padding.text = 2.5, points = list(pch=pch.legend, col=col.legend, cex=1.25)
+         , text=list(levels(as.factor(x$RRmodel))))
+         ))
     dev.flush()
   }
   if(show[4])
   {
     grouped.pi <- getCellMeans(y = pi, factor.groups = unique.groups)
     dev.hold()
-    print(lattice::xyplot(grouped.res ~ grouped.pi, main = "Residuals vs. Predicted honest response (grouped)", ylab = ylab.grouped.res,
-         xlab = "Predicted affirmative honest response probability"))
+    print(lattice::xyplot(grouped.res ~ grouped.pi, main = "Residuals vs. Fitted randomized response probability (grouped)", ylab = list(label = ylab.grouped.res, cex=1.1),
+         xlab = list(label = "Fitted randomized response probability", cex=1.1), cex = 1.2, pch = 16, col = col.set[2], scales = list(cex = 1.05)))
     dev.flush()
   }
   if(show[5])
   {
     grouped.res.hl <- residuals(x, type = "hosmer-lemeshow", ngroups = ngroups)
     dev.hold()
-    print(lattice::xyplot(grouped.res.hl ~ 1:ngroups, main = "Residuals vs. Predicted honest response (HL)", ylab = "Hosmer-Lemeshow residuals",
-         xlab = "Groups by predicted affirmative response probability"))
+    print(lattice::xyplot(grouped.res.hl ~ 1:ngroups, main = "Residuals vs. Fitted randomized response probability (HL)", ylab = list(label = "Hosmer-Lemeshow residuals", cex=1.1),
+         xlab = list(label = "Groups by fitted randomized response probability", cex=1.1), cex = 1.2, pch = 16, col = col.set[3], scales = list(cex = 1.05)))
     dev.flush()
   }
   if(show[6])
   {
     dev.hold()
-    print(lattice::qqmath( ~ grouped.res, xlab = "Theoretical Quantiles", ylab = ylab.grouped.res,
-                           prepanel = lattice::prepanel.qqmathline,
-                           panel = function(x, y) {
-                             lattice::panel.qqmathline(x, distribution = qnorm)
-                             lattice::panel.qqmath(x)
+    print(lattice::qqmath( ~ grouped.res, main = "Normal Q-Q plot of grouped (on covariates) residuals", xlab = list(label = "Theoretical Quantiles", cex=1.1), ylab = list(label = ylab.grouped.res, cex=1.1), scales = list(cex = 1.05)
+                           , prepanel = lattice::prepanel.qqmathline
+                           , panel = function(x, y) {
+                             lattice::panel.qqmathline(x, distribution = qnorm, lwd = 1)
+                             lattice::panel.qqmath(x, cex = 1.2, pch = 16, col = col.set[2])
                            }))
     dev.flush()
   }
@@ -135,11 +152,9 @@ plot.RRglm <- function(x, which = c(1, 3, 4, 6), type = c("deviance", "pearson")
 #' Five plots (selectable by \code{which}) are currently available: (1) a plot of estimated population prevalence per RR model,
 #' (2) a plot of estimated population prevalence per protection level,
 #' (3) a plot of random effects and their conditional variance (95%-cI),
-#' (4) a plot of conditional pearson residuals against predicted honest response,
-#' and (5) a plot of unconditional pearson residuals against predicted honest response.
+#' (4) a plot of conditional pearson residuals against fitted randomized response probability,
+#' and (5) a plot of unconditional pearson residuals against fitted randomized response probability.
 #' By default, plots 1, 3, 4 and 5 are provided.
-#' Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-#' Responses.} Manuscript submitted for publication.
 #'
 #' @param x
 #' an object of class RRglmerMod.
@@ -155,7 +170,7 @@ plot.RRglm <- function(x, which = c(1, 3, 4, 6), type = c("deviance", "pearson")
 #'          etastart = rep(0.01, nrow(Plagiarism)),
 #'          control = glmerControl(optimizer = "Nelder_Mead", tolPwrss = 1e-03), nAGQ = 1)
 #' plot(out, which = 1:5)
-plot.RRglmerMod <- function(x, which = c(1, 3 , 4, 5), ...)
+plot.RRglmerMod <- function(x, which = c(1, 3, 4, 5), ...)
 {
   #3: random effects
   #4: conditional pearson
@@ -164,13 +179,25 @@ plot.RRglmerMod <- function(x, which = c(1, 3 , 4, 5), ...)
   show <- rep(FALSE, 3)
   show[which] <- TRUE
 
-  eta <- predict(x, type = "link")
-  pi <- exp(eta) / (1 + exp(eta))
+  # eta <- predict(x, type = "link")
+  # pi <- exp(eta) / (1 + exp(eta))
+  pi <- fitted(x)
 
   if(any(show[1], show[2]))
   {
     s <- summary(x)
   }
+
+  if (length(levels(as.factor(x@RRparam$RRmodel))) <= 9) {
+    col.set <- RColorBrewer::brewer.pal(9, "Set1")
+  }
+  else if (length(levels(as.factor(x@RRparam$RRmodel))) > 9 && length(levels(as.factor(x@RRparam$RRmodel))) <= 12) {
+    col.set <- RColorBrewer::brewer.pal(12, "Set3")
+  }
+  else {
+    col.set <- rep("blue", length(levels(as.factor(x@RRparam$RRmodel))))
+  }
+
 
   oask <- devAskNewPage(TRUE)
   on.exit(devAskNewPage(oask))
@@ -183,7 +210,7 @@ plot.RRglmerMod <- function(x, which = c(1, 3 , 4, 5), ...)
     rownames(tmp$Prevalence) <- paste(p$Item, " (", p$RRmodel, ")", sep="")
 
     dev.hold()
-    ignore <- capture.output(print(intDotplot(tmp, mtit = "Prevalence (95%-CI)")))
+    ignore <- capture.output(print(intDotplot(tmp, mtit = "Prevalence (95%-CI)", cex = 1, scales = list(cex = 1.05))))
     dev.flush()
   }
   if(show[2])
@@ -195,32 +222,50 @@ plot.RRglmerMod <- function(x, which = c(1, 3 , 4, 5), ...)
     rownames(tmp$Prevalence) <- paste(p$Item, " (", p$model.level, ")", sep="")
 
     dev.hold()
-    ignore <- capture.output(print(intDotplot(tmp, mtit = "Prevalence (95%-CI)")))
+    ignore <- capture.output(print(intDotplot(tmp, mtit = "Prevalence (95%-CI)", cex = 1, scales = list(cex = 1.05))))
     dev.flush()
   }
   if(show[3])
   {
     random.effects <- ranef(x, condVar=TRUE)
     dev.hold()
-    ignore <- capture.output(print(intDotplot(random.effects, mtit = "Random effects (95%-CI)")))
+    ignore <- capture.output(print(intDotplot(random.effects, mtit = "Random effects (95%-CI)", cex = 1, scales = list(cex = 1.05))))
     dev.flush()
   }
   if(show[4])
   {
     res.conditional <- residuals(x, type = "pearson")
     ylab <- "Conditional pearson residuals"
-    xlab <- "Predicted affirmative honest response probability"
+    xlab <- "Fitted randomized response probability"
+
+    col <- col.set[as.numeric(as.factor(x@RRparam$RRmodel))]
+    col.legend <- col.set[1:length(levels(as.factor(x@RRparam$RRmodel)))]
+    pch <- as.numeric(as.factor(x@RRparam$RRmodel)) + 14
+    pch.legend <- 1:length(levels(as.factor(x@RRparam$RRmodel))) + 14
     dev.hold()
-    print(lattice::xyplot(res.conditional ~ pi, xlab = xlab, ylab = ylab))
+    print(lattice::xyplot(res.conditional ~ pi, main = "Residuals vs. Fitted randomized response probability", ylab = list(label = ylab, cex=1.1),
+                          xlab = list(label =xlab, cex=1.1), cex = 1.2, pch = pch, col = col, scales = list(cex = 1.05)
+                          , key=list(corner=c(1,1), border = TRUE, padding.text = 2.5, points = list(pch=pch.legend, col=col.legend, cex=1.25)
+                                     , text=list(levels(as.factor(x@RRparam$RRmodel))))
+    ))
     dev.flush()
   }
   if(show[5])
   {
     res.unconditional <- residuals(x, type = "unconditional.pearson")
     ylab <- "Unconditional pearson residuals"
-    xlab <- "Predicted affirmative honest response probability"
+    xlab <- "Fitted randomized response probability"
+
+    col <- col.set[as.numeric(as.factor(x@RRparam$RRmodel))]
+    col.legend <- col.set[1:length(levels(as.factor(x@RRparam$RRmodel)))]
+    pch <- as.numeric(as.factor(x@RRparam$RRmodel)) + 14
+    pch.legend <- 1:length(levels(as.factor(x@RRparam$RRmodel))) + 14
     dev.hold()
-    print(lattice::xyplot(res.unconditional ~ pi, xlab = xlab, ylab = ylab))
+    print(lattice::xyplot(res.unconditional ~ pi, main = "Residuals vs. Fitted randomized response probability", ylab = list(label = ylab, cex=1.1),
+                          xlab = list(label =xlab, cex=1.1), cex = 1.2, pch = pch, col = col, scales = list(cex = 1.05)
+                          , key=list(corner=c(1,1), border = TRUE, padding.text = 2.5, points = list(pch=pch.legend, col=col.legend, cex=1.25)
+                                     , text=list(levels(as.factor(x@RRparam$RRmodel))))
+    ))
     dev.flush()
   }
 

@@ -37,8 +37,8 @@ An object of class RRglm. Extends the class \code{glm} with Randomize Response d
 }
 \description{
 Fit a generalized linear model (GLM) with binary Randomized Response data.
-Implemented as a wrapper for \code{\link{glm}}. Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016).
-\emph{Generalized Linear Mixed Models for Randomized Responses.} Manuscript submitted for publication.
+Implemented as a wrapper for \code{\link{glm}}. Reference: Fox, J-P, Veen, D. and Klotzke, K. (2018).
+Generalized Linear Mixed Models for Randomized Responses. \emph{Methodology.} https://doi.org/10.1027/1614-2241/a000153
 }
 \examples{
 # Fit the model with fixed effects for gender, RR, pp and age using the logit link function.
@@ -51,4 +51,3 @@ summary(out)
 \seealso{
 \code{\link{glm}}
 }
-

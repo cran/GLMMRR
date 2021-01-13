@@ -2,8 +2,6 @@
 #'
 #' Compute goodness-of-fit statistics for binary Randomized Response data.
 #' Pearson, Deviance and Hosmer-Lemeshow statistics are available.
-#' Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-#' Responses.} Manuscript submitted for publication.
 #'
 #' @param RRglmOutput
 #' a model fitted with the \code{\link{RRglm}} function.
@@ -17,8 +15,6 @@
 #' number of groups to split the data into for the Hosmer-Lemeshow statistic (default: 10).
 #' @param rm.na
 #' remove cases with missing data.
-#' @param print
-#' print summary of goodness-of-fit statistics.
 #'
 #' @return
 #' an option of class RRglmGOF.
@@ -27,8 +23,8 @@
 #' @examples
 #'out <- RRglm(response ~ Gender + RR + pp + age, link="RRlink.logit", RRmodel=RRmodel,
 #'          p1=RRp1, p2=RRp2, data=Plagiarism, etastart=rep(0.01, nrow(Plagiarism)))
-#'RRglmGOF(RRglmOutput = out, doPearson = TRUE, doDeviance = TRUE, doHlemeshow = TRUE, print = TRUE)
-RRglmGOF <- function(RRglmOutput, doPearson = TRUE, doDeviance = TRUE, doHlemeshow = TRUE, hlemeshowGroups = 10, rm.na = TRUE, print = TRUE)
+#'RRglmGOF(RRglmOutput = out, doPearson = TRUE, doDeviance = TRUE, doHlemeshow = TRUE)
+RRglmGOF <- function(RRglmOutput, doPearson = TRUE, doDeviance = TRUE, doHlemeshow = TRUE, hlemeshowGroups = 10, rm.na = TRUE)
 {
   # Initialize
   pearson <- list(do = doPearson, obs = NULL, exp = NULL, res = NULL, stat = NA, pvalue = NA, df = NA, nGroup = NA)
@@ -72,7 +68,7 @@ RRglmGOF <- function(RRglmOutput, doPearson = TRUE, doDeviance = TRUE, doHlemesh
 
     if(nGroup <= nParam)
     {
-      cat("The Pearson Fit statistic is defind for an unsaturated model","\n")
+      cat("The Pearson Fit statistic is defined for an unsaturated model","\n")
       cat("The number of unique groups should be higher than the number of estimated parameters","\n")
     }
     else
@@ -184,7 +180,7 @@ RRglmGOF <- function(RRglmOutput, doPearson = TRUE, doDeviance = TRUE, doHlemesh
     hlemeshow$overview <- df.hlemeshow
   }
 
-  ls.return <- list(pearson = pearson, deviance = deviance, hlemeshow = hlemeshow, vars = vars, n = nrow(df.work))
+  ls.return <- list(pearson = pearson, deviance = deviance, hlemeshow = hlemeshow, vars = vars, n = nrow(df.work), family = RRglmOutput$family)
   class(ls.return) <- "RRglmGOF"
   return(ls.return)
 }

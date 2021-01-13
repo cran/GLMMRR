@@ -1,9 +1,5 @@
 #' Compute Estimated Population Prevalence
 #'
-#' Reference:
-#' Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-#' Responses.} Manuscript submitted for publication.
-#'
 #'
 #' @param mu
 #' observed mean response.

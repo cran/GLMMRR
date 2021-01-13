@@ -2,8 +2,8 @@
 #' Fitting Generalized Linear Models with binary Randomized Response data
 #'
 #' Fit a generalized linear model (GLM) with binary Randomized Response data.
-#' Implemented as a wrapper for \code{\link{glm}}. Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016).
-#' \emph{Generalized Linear Mixed Models for Randomized Responses.} Manuscript submitted for publication.
+#' Implemented as a wrapper for \code{\link{glm}}. Reference: Fox, J-P, Veen, D. and Klotzke, K. (2018).
+#' Generalized Linear Mixed Models for Randomized Responses. \emph{Methodology.} https://doi.org/10.1027/1614-2241/a000153
 #'
 #' @param formula
 #' a two-sided linear formula object describing the model to be fitted,
@@ -85,6 +85,7 @@ RRglm <- function (formula, link, item, RRmodel, p1, p2, data, na.action = "na.o
 
   # Add item identifier and RR parameters to the output object
   output$Item <- RRdata$Item
+  output$RRlink <- link
   output$RRmodel <- RRdata$RRmodel
   output$RRp1 <- RRdata$p1
   output$RRp2 <- RRdata$p2

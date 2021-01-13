@@ -15,7 +15,5 @@ RRlink.cloglog(c, d)
 RR link function.
 }
 \description{
-Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-Responses.} Manuscript submitted for publication.
+Log-Log link function with Randomized Response parameters.
 }
-

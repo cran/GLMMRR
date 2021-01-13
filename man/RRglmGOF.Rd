@@ -4,8 +4,14 @@
 \alias{RRglmGOF}
 \title{Goodness-of-fit statistics for binary Randomized Response data}
 \usage{
-RRglmGOF(RRglmOutput, doPearson = TRUE, doDeviance = TRUE,
-  doHlemeshow = TRUE, hlemeshowGroups = 10, rm.na = TRUE, print = TRUE)
+RRglmGOF(
+  RRglmOutput,
+  doPearson = TRUE,
+  doDeviance = TRUE,
+  doHlemeshow = TRUE,
+  hlemeshowGroups = 10,
+  rm.na = TRUE
+)
 }
 \arguments{
 \item{RRglmOutput}{a model fitted with the \code{\link{RRglm}} function.}
@@ -19,8 +25,6 @@ RRglmGOF(RRglmOutput, doPearson = TRUE, doDeviance = TRUE,
 \item{hlemeshowGroups}{number of groups to split the data into for the Hosmer-Lemeshow statistic (default: 10).}
 
 \item{rm.na}{remove cases with missing data.}
-
-\item{print}{print summary of goodness-of-fit statistics.}
 }
 \value{
 an option of class RRglmGOF.
@@ -28,12 +32,9 @@ an option of class RRglmGOF.
 \description{
 Compute goodness-of-fit statistics for binary Randomized Response data.
 Pearson, Deviance and Hosmer-Lemeshow statistics are available.
-Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-Responses.} Manuscript submitted for publication.
 }
 \examples{
 out <- RRglm(response ~ Gender + RR + pp + age, link="RRlink.logit", RRmodel=RRmodel,
          p1=RRp1, p2=RRp2, data=Plagiarism, etastart=rep(0.01, nrow(Plagiarism)))
-RRglmGOF(RRglmOutput = out, doPearson = TRUE, doDeviance = TRUE, doHlemeshow = TRUE, print = TRUE)
+RRglmGOF(RRglmOutput = out, doPearson = TRUE, doDeviance = TRUE, doHlemeshow = TRUE)
 }
-

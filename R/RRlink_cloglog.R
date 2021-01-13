@@ -2,8 +2,6 @@
 
 #' Log-Log link function with Randomized Response parameters.
 #'
-#' Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-#' Responses.} Manuscript submitted for publication.
 #'
 #' @param c
 #' a numeric vector containing the parameter c.

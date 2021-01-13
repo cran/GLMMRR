@@ -19,8 +19,5 @@ getMLPrevalence(mu, n, c, d)
 maximum likelihood estimate of the population prevalence and its variance.
 }
 \description{
-Reference:
-Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-Responses.} Manuscript submitted for publication.
+Compute Estimated Population Prevalence
 }
-

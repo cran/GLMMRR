@@ -19,4 +19,3 @@ An object of class summary.RRglm. Extends the class \code{summary.glm} with Rand
 \description{
 Summarizing GLMMRR fits for fixed-effect models
 }
-

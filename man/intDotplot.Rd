@@ -15,4 +15,3 @@ intDotplot(x, mtit = "95\%-CI", ...)
 Sligthly modified function dotplot.ranef.mer from lme4 package.
 }
 \keyword{internal}
-

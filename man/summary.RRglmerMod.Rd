@@ -19,4 +19,3 @@ An object of class summary.RRglmerMod. Extends the class \code{summary.glmerMod}
 \description{
 Summarizing GLMMRR fits for fixed-effect models
 }
-

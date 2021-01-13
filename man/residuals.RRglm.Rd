@@ -4,9 +4,13 @@
 \alias{residuals.RRglm}
 \title{Accessing GLMMRR Fits for fixed-effect models}
 \usage{
-\method{residuals}{RRglm}(object, type = c("deviance", "pearson", "working",
-  "response", "partial", "deviance.grouped", "pearson.grouped",
-  "hosmer-lemeshow"), ngroups = 10, ...)
+\method{residuals}{RRglm}(
+  object,
+  type = c("deviance", "pearson", "working", "response", "partial", "deviance.grouped",
+    "pearson.grouped", "hosmer-lemeshow"),
+  ngroups = 10,
+  ...
+)
 }
 \arguments{
 \item{object}{an object of class RRglm.}
@@ -23,10 +27,7 @@ A vector of residuals.
 }
 \description{
 Compute residuals for RRglm objects. Extends \code{\link{residuals.glm}} with residuals for grouped binary Randomized Response data.
-Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-Responses.} Manuscript submitted for publication.
 }
 \seealso{
 \code{\link{residuals.glm}}
 }
-

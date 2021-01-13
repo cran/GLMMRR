@@ -4,9 +4,12 @@
 \alias{residuals.RRglmerMod}
 \title{Accessing GLMMRR Fits for mixed-effect models}
 \usage{
-\method{residuals}{RRglmerMod}(object, type = c("deviance", "pearson",
-  "working", "response", "partial", "unconditional.response",
-  "unconditional.pearson"), ...)
+\method{residuals}{RRglmerMod}(
+  object,
+  type = c("deviance", "pearson", "working", "response", "partial",
+    "unconditional.response", "unconditional.pearson"),
+  ...
+)
 }
 \arguments{
 \item{object}{an object of class RRglmer.}
@@ -22,10 +25,7 @@ A vector of residuals.
 \description{
 Compute residuals for RRglmer objects. Extends \code{\link{residuals.glmResp}} to access conditional and
 unconditional residuals for grouped binary Randomized Response data.
-Reference: Fox, J-P, Klotzke, K. and Veen, D. (2016). \emph{Generalized Linear Mixed Models for Randomized
-Responses.} Manuscript submitted for publication.
 }
 \seealso{
 \code{\link{residuals.glmResp}}
 }
-
