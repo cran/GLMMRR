@@ -26,8 +26,8 @@
 A vector of residuals.
 }
 \description{
-Compute residuals for RRglm objects. Extends \code{\link{residuals.glm}} with residuals for grouped binary Randomized Response data.
+Compute residuals for RRglm objects. Extends \code{\link[stats:residuals.glm]{residuals.glm}} with residuals for grouped binary Randomized Response data.
 }
 \seealso{
-\code{\link{residuals.glm}}
+\code{\link[stats:residuals.glm]{residuals.glm}}
 }

@@ -2,7 +2,7 @@
 #' Fitting Generalized Linear Models with binary Randomized Response data
 #'
 #' Fit a generalized linear model (GLM) with binary Randomized Response data.
-#' Implemented as a wrapper for \code{\link{glm}}. Reference: Fox, J-P, Veen, D. and Klotzke, K. (2018).
+#' Implemented as a wrapper for \code{\link[stats:glm]{glm}}. Reference: Fox, J-P, Veen, D. and Klotzke, K. (2018).
 #' Generalized Linear Mixed Models for Randomized Responses. \emph{Methodology.} https://doi.org/10.1027/1614-2241/a000153
 #'
 #' @param formula
@@ -26,15 +26,15 @@
 #' from the environment from which RRglm is called.
 #' @param na.action
 #' a function that indicates what should happen when the data contain NAs.
-#' The default action (\code{\link{na.omit}}, as given by \code{getOption("na.action"))})
+#' The default action (\code{\link[stats:na.omit]{na.omit}}, as given by \code{getOption("na.action"))})
 #' strips any observations with any missing values in any variables.
 #' @param ...
-#' other potential arguments to be passed to \code{\link{glm}}.
+#' other potential arguments to be passed to \code{\link[stats]{glm}}.
 #'
 #' @return
 #' An object of class RRglm. Extends the class \code{glm} with Randomize Response data.
 #' @export
-#' @seealso \code{\link{glm}}
+#' @seealso \code{\link[stats:glm]{glm}}
 #'
 #' @examples
 #' # Fit the model with fixed effects for gender, RR, pp and age using the logit link function.

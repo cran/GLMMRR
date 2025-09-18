@@ -27,17 +27,17 @@ If the required information cannot be found in the data frame, or if no data fra
 from the environment from which RRglm is called.}
 
 \item{na.action}{a function that indicates what should happen when the data contain NAs.
-The default action (\code{\link{na.omit}}, as given by \code{getOption("na.action"))})
+The default action (\code{\link[stats:na.omit]{na.omit}}, as given by \code{getOption("na.action"))})
 strips any observations with any missing values in any variables.}
 
-\item{...}{other potential arguments to be passed to \code{\link{glm}}.}
+\item{...}{other potential arguments to be passed to \code{\link[stats]{glm}}.}
 }
 \value{
 An object of class RRglm. Extends the class \code{glm} with Randomize Response data.
 }
 \description{
 Fit a generalized linear model (GLM) with binary Randomized Response data.
-Implemented as a wrapper for \code{\link{glm}}. Reference: Fox, J-P, Veen, D. and Klotzke, K. (2018).
+Implemented as a wrapper for \code{\link[stats:glm]{glm}}. Reference: Fox, J-P, Veen, D. and Klotzke, K. (2018).
 Generalized Linear Mixed Models for Randomized Responses. \emph{Methodology.} https://doi.org/10.1027/1614-2241/a000153
 }
 \examples{
@@ -49,5 +49,5 @@ out <- RRglm(response ~ Gender + RR + pp + age, link="RRlink.logit", RRmodel=RRm
 summary(out)
 }
 \seealso{
-\code{\link{glm}}
+\code{\link[stats:glm]{glm}}
 }

@@ -2,9 +2,17 @@ Package: GLMMRR
 Type: Package
 Title: Generalized Linear Mixed Model (GLMM) for Binary Randomized
         Response Data
-Version: 0.5.0
-Author: Jean-Paul Fox [aut], Konrad Klotzke [aut], Duco Veen [aut]
-Maintainer: Konrad Klotzke <omd.bms.utwente.stats@gmail.com>
+Version: 0.6.0
+Authors@R: c(person(given = "Jean-Paul",
+                         family = "Fox",
+                         role = c("aut", "cre"),
+                         email = "jpfox00@gmail.com"),
+                  person(given = "Konrad",
+                         family = "Klotzke",
+                         role = "aut"),
+                  person(given = "Duco",
+                         family = "Veen",
+                         role = "aut"))
 Depends: R (>= 3.5.0), lme4, methods
 Imports: lattice, stats, utils, grDevices, RColorBrewer
 Description: Generalized Linear Mixed Model (GLMM) for Binary Randomized Response Data.
@@ -13,8 +21,12 @@ Description: Generalized Linear Mixed Model (GLMM) for Binary Randomized Respons
     Reference: Fox, J-P, Veen, D. and Klotzke, K. (2018). Generalized Linear Mixed Models for Randomized Responses. Methodology. <doi:10.1027/1614-2241/a000153>.
 License: GPL-3
 LazyData: TRUE
-RoxygenNote: 7.1.1
+RoxygenNote: 7.3.3
 NeedsCompilation: no
-Packaged: 2021-01-13 14:09:18 UTC; kk
+Packaged: 2025-09-18 08:21:50 UTC; FoxGJA
+Author: Jean-Paul Fox [aut, cre],
+  Konrad Klotzke [aut],
+  Duco Veen [aut]
+Maintainer: Jean-Paul Fox <jpfox00@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-01-13 14:50:03 UTC
+Date/Publication: 2025-09-18 12:40:08 UTC

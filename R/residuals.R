@@ -1,6 +1,6 @@
 #' Accessing GLMMRR Fits for fixed-effect models
 #'
-#' Compute residuals for RRglm objects. Extends \code{\link{residuals.glm}} with residuals for grouped binary Randomized Response data.
+#' Compute residuals for RRglm objects. Extends \code{\link[stats:residuals.glm]{residuals.glm}} with residuals for grouped binary Randomized Response data.
 #'
 #' @param object
 #' an object of class RRglm.
@@ -16,7 +16,7 @@
 #' A vector of residuals.
 #' @method residuals RRglm
 #' @export
-#' @seealso \code{\link{residuals.glm}}
+#' @seealso \code{\link[stats:residuals.glm]{residuals.glm}}
 residuals.RRglm <- function (object, type = c("deviance", "pearson", "working", "response", "partial",
                                               "deviance.grouped", "pearson.grouped", "hosmer-lemeshow"), ngroups = 10, ...)
 {
@@ -94,7 +94,7 @@ residuals.RRglm <- function (object, type = c("deviance", "pearson", "working", 
 
 #' Accessing GLMMRR Fits for mixed-effect models
 #'
-#' Compute residuals for RRglmer objects. Extends \code{\link{residuals.glmResp}} to access conditional and
+#' Compute residuals for RRglmer objects. Extends \code{\link[lme4:residuals.glmResp]{residuals.glmResp}} to access conditional and
 #' unconditional residuals for grouped binary Randomized Response data.
 #'
 #' @param object
@@ -109,7 +109,7 @@ residuals.RRglm <- function (object, type = c("deviance", "pearson", "working", 
 #' A vector of residuals.
 #' @method residuals RRglmerMod
 #' @export
-#' @seealso \code{\link{residuals.glmResp}}
+#' @seealso \code{\link[lme4:residuals.glmResp]{residuals.glmResp}}
 residuals.RRglmerMod <- function(object, type = c("deviance", "pearson", "working", "response",
                                                   "partial", "unconditional.response", "unconditional.pearson"), ...)
 {

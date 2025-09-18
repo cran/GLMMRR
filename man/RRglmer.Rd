@@ -38,15 +38,15 @@ Available options: "DQ", "Warner", "Forced", "UQM", "Crosswise", "Triangular" an
 If the required information cannot be found in the data frame, or if no data frame is given, then the variables are taken
 from the environment from which RRglmer is called.}
 
-\item{control}{a list (of correct class, resulting from \code{\link{lmerControl}()} or \code{\link{glmerControl}()} respectively) containing control parameters,
+\item{control}{a list (of correct class, resulting from \code{\link[lme4:lmerControl]{lmerControl}()} or \code{\link[lme4:glmerControl]{glmerControl}()} respectively) containing control parameters,
 including the nonlinear optimizer to be used and parameters to be passed through to the nonlinear optimizer,
-see the \code{*lmerControl} documentation for details.}
+see the \code{\link[lme4:lmerControl]{lmerControl}} documentation for details.}
 
 \item{na.action}{a function that indicates what should happen when the data contain NAs.
-The default action (\code{\link{na.omit}}, as given by \code{getOption("na.action"))})
+The default action (\code{\link[stats:na.omit]{na.omit}}, as given by \code{getOption("na.action"))})
 strips any observations with any missing values in any variables.}
 
-\item{...}{other potential arguments to be passed to \code{\link{glmer}}.}
+\item{...}{other potential arguments to be passed to \code{\link[lme4:glmer]{glmer}}.}
 }
 \value{
 An object of class RRglmerMod. Extends the class \code{glmerMod} with Randomize Response data,
@@ -56,7 +56,7 @@ for which many methods are available (e.g. \code{methods(class="glmerMod")}).
 Fit a generalized linear mixed-effects model (GLMM) with binary Randomized Response data.
 Both fixed effects and random effects are specified via the model formula.
 Randomize response parameters can be entered either as single values or as vectors.
-Implemented as a wrapper for \code{\link{glmer}}. Reference: Fox, J-P, Veen, D. and Klotzke, K. (2018).
+Implemented as a wrapper for \code{\link[lme4:glmer]{glmer}}. Reference: Fox, J-P, Veen, D. and Klotzke, K. (2018).
 Generalized Linear Mixed Models for Randomized Responses. \emph{Methodology.} https://doi.org/10.1027/1614-2241/a000153
 }
 \examples{
@@ -71,5 +71,5 @@ out <- RRglmer(response ~ Gender + RR + pp + (1|age), link="RRlink.logit", RRmod
 summary(out)
 }
 \seealso{
-\code{\link{lme4}}
+\code{\link[lme4:glmer]{glmer}}
 }

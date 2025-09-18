@@ -23,9 +23,9 @@
 A vector of residuals.
 }
 \description{
-Compute residuals for RRglmer objects. Extends \code{\link{residuals.glmResp}} to access conditional and
+Compute residuals for RRglmer objects. Extends \code{\link[lme4:residuals.glmResp]{residuals.glmResp}} to access conditional and
 unconditional residuals for grouped binary Randomized Response data.
 }
 \seealso{
-\code{\link{residuals.glmResp}}
+\code{\link[lme4:residuals.glmResp]{residuals.glmResp}}
 }
